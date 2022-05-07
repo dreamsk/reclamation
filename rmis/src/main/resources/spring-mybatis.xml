@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<context:component-scan base-package="com"/>
+	
+	
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<!-- 
+			可以读取多个properties配置文件
+			当多个配置文件中出现同样名称的属性的时候，后面会覆盖前面的
+			根据配置顺序，取最后一个同名的属性的值
+			
+			出现同名属性在开发中是有问题的，我们的基本原则是保证每个配置文件的属性名是不重复的
+			一般属性名称会设置成“配置文件名.属性名”或者是“配置文件名.类型.属性名”
+			 -->
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 配置c3p0数据源的bean -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.mysql.driverClass}"></property>
+		<!-- 
+		jdbc:mysql://localhost:3306/demo?useUnicode=true&amp;characterEncoding=UTF-8
+		这个jdbcUrl，在xml文件和properties文件中写法稍微的有点差别
+		其中的&amp;是在xml中的写法，在properties文件中直接就是&就可以
+		 -->
+		<property name="jdbcUrl" value="${jdbc.mysql.jdbcUrl}"></property>
+		<property name="user" value="${jdbc.mysql.user}"></property>
+		<property name="password" value="${jdbc.mysql.password}"></property>
+		<!-- 创建数据库连接池之后初始化的数据库的连接数，默认3 -->
+		<property name="initialPoolSize" value="${jdbc.mysql.initialPoolSize}"></property>
+		<!-- 连接池中可以存在的最大连接数，默认15 -->
+		<property name="maxPoolSize" value="${jdbc.mysql.maxPoolSize}"></property>
+		<!-- 当连接池中的连接用完的时候，c3p0一次性创建的新的连接数 -->
+		<property name="acquireIncrement" value="${jdbc.mysql.acquireIncrement}"></property>
+	</bean>
+	
+	<!-- spring整合mybatis,注册sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 
+			设置自动扫描mapper.xml文件的路径
+			例如classpath:com/test/*/xml/*.xml
+			在src下的com.test.*.xml包下的*.xml文件，这里的*是任意字符
+			这种写法生效的原因，在于我们对项目的包名做了规划
+			规定的规则就是com.test.*.xml包中放置mapper.xml文件
+		 -->
+		<property name="mapperLocations" value="classpath:com/reclamation/mapper/*.xml"></property>
+		<!-- 设置扫描myBatis-config.xml文件的路径 -->
+		<property name="configLocation" value="classpath:myBatis-config.xml"></property>
+	</bean>
+	
+	<!-- 
+		我们准备使用mybatis开发，使用的接口+xml映射器
+		需要在spring中设置自动的给接口去做一个代理的实现类
+	 -->
+	 <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	 	<!-- 
+	 		根据三层架构，mybatis接口应该放置数据访问层
+	 		数据访问层一般定义成包名为dao
+	 		根据业务不同，com.test.user.dao，com.test.student.dao
+	 		综合起来就写成com.test.*.dao
+	 		就代表扫描com.test.*.dao下面所有接口
+	 	 -->
+	 	<property name="basePackage" value="com.reclamation.mapper"></property>
+	 	<!-- 
+	 		这个地方设置的是一个字符串的值，sqlSessionFactory的bean的id
+	 	 -->
+	 	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	 </bean>
+	
+	<!-- 
+	配置事务管理器的bean
+	事务管理器DataSourceTransactionManager，适用于基于数据源的Connection访问数据库的框架
+	目前我们学到的是JdbcTemplate和MybBatis是基于数据源的Connection访问数据库的框架
+	 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 
+	配置事务的通知
+	id是唯一的标识，尽量定名的时候是有意义的名称
+	transaction-manager，是指定使用的事务管理器的bean，值就bean的id
+	 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<!-- 
+				对于tx:method的配置，也是根据一定开发规范
+				一般查询，方法名getXXX,findXXX
+				添加，方法名insertXXX,addXXXX,saveXXX
+				修改，方法updateXXX
+				删除，方法deleteXXXX，delXXXXX
+			 -->
+			<tx:method name="get*" read-only="true"></tx:method>
+			<tx:method name="find*" read-only="true"></tx:method>
+			<tx:method name="insert*" read-only="false"></tx:method>
+			<tx:method name="add*" read-only="false"></tx:method>
+			<tx:method name="save*" read-only="false"></tx:method>
+			<tx:method name="update*" read-only="false"></tx:method>
+			<tx:method name="delete*" read-only="false"></tx:method>
+			<tx:method name="del*" read-only="false"></tx:method>
+			<!-- 
+			spring的事务通知会按照配置tx:method的顺序来匹配
+			所以我们在最后配置一个*
+			就是当上面的所有tx:method都匹配不上，就匹配最后一个
+			最后一个是*，就是匹配所有的字符，也就是所有的方法
+			这样的话就可以把aop:pointcut表达式代表的类的所有方法都纳入到tx:advice通知中
+			 -->
+			<tx:method name="*" read-only="false"></tx:method>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 
+	事务的AOP配置
+	多个aop:config标签不是单独的，而是看着一个整体，也就是说多个aop:config和写一个aop:config一样
+	aop:config中的aop:pointcut标签，如果这个aop:pointcut标签有重复的id，按照从上到下的顺序，以最下面的id代表
+	的aop:pointcut为准，为了保证所有的aop:pointcut标签都有效，那么这些标签的id不要重复
+	 -->
+	<aop:config>
+		<!-- 
+			根据三层架构，业务逻辑层调用数据访问层
+			也就是service层调用dao层
+			从通配的角度讲业务逻辑层的包名定义com.test.*.service
+			根据开发规则，我们会把所有的业务逻辑层方法放到com.test.*.service包下
+			业务逻辑层方法调用dao层的方法
+			一般事务都是控制在业务逻辑层，默认一个业务逻辑层的方法就是一个整体的事务
+			dao层的方法只是一个个单独的增删改查
+		 -->
+		<aop:pointcut expression="execution( * com.reclamation.*.service.*.*(..))" id="txpt"></aop:pointcut>
+		<!-- 
+		advice-ref,事务通知tx:advice的id
+		pointcut-ref，aop:pointcut切面的id
+		aop:advisor可以配置多个
+		
+		aop:advisor标签，起到的是一个上关下联的作用
+		其中的advice-ref属性的值实际上是事务管理器相关的配置
+		其中的pointcut-ref属性的值关联的是定义哪些类的哪些方法被spring的事务所管理
+		 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txpt"></aop:advisor>
+	</aop:config>
+	
+	
+</beans>

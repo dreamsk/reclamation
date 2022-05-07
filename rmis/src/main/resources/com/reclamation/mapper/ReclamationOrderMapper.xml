@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.reclamation.mapper.ReclamationOrderMapper">
+  <resultMap id="BaseResultMap" type="com.reclamation.reclamationOrder.domain.ReclamationOrder">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="scrap_code" jdbcType="VARCHAR" property="scrapCode" />
+    <result column="owner_id" jdbcType="VARCHAR" property="ownerId" />
+    <result column="sc_id" jdbcType="VARCHAR" property="scId" />
+    <result column="rd_id" jdbcType="VARCHAR" property="rdId" />
+    <result column="amount" jdbcType="INTEGER" property="amount" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="money" jdbcType="INTEGER" property="money" />
+    <result column="sc_status" jdbcType="VARCHAR" property="scStatus" />
+    <result column="rd_status" jdbcType="VARCHAR" property="rdStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+    <result column="scrap_name" jdbcType="VARCHAR" property="scrapName" />
+    <result column="owner_name" jdbcType="VARCHAR" property="ownerName" />
+    <result column="sc_name" jdbcType="VARCHAR" property="scName" />
+    <result column="sc_status_val" jdbcType="VARCHAR" property="scStatusVal" />
+    <result column="rd_status_val" jdbcType="VARCHAR" property="rdStatusVal" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, order_no, scrap_code, owner_id, sc_id, rd_id, amount, unit, money, sc_status, 
+    rd_status, create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrderExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from reclamation_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from reclamation_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from reclamation_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrderExample">
+    delete from reclamation_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrder">
+    insert into reclamation_order (id, order_no, scrap_code, 
+      owner_id, sc_id, rd_id, 
+      amount, unit, money, 
+      sc_status, rd_status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{scrapCode,jdbcType=VARCHAR}, 
+      #{ownerId,jdbcType=VARCHAR}, #{scId,jdbcType=VARCHAR}, #{rdId,jdbcType=VARCHAR}, 
+      #{amount,jdbcType=INTEGER}, #{unit,jdbcType=VARCHAR}, #{money,jdbcType=INTEGER}, 
+      #{scStatus,jdbcType=VARCHAR}, #{rdStatus,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrder">
+    insert into reclamation_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="scrapCode != null">
+        scrap_code,
+      </if>
+      <if test="ownerId != null">
+        owner_id,
+      </if>
+      <if test="scId != null">
+        sc_id,
+      </if>
+      <if test="rdId != null">
+        rd_id,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="unit != null">
+        unit,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="scStatus != null">
+        sc_status,
+      </if>
+      <if test="rdStatus != null">
+        rd_status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="scrapCode != null">
+        #{scrapCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerId != null">
+        #{ownerId,jdbcType=VARCHAR},
+      </if>
+      <if test="scId != null">
+        #{scId,jdbcType=VARCHAR},
+      </if>
+      <if test="rdId != null">
+        #{rdId,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=INTEGER},
+      </if>
+      <if test="unit != null">
+        #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=INTEGER},
+      </if>
+      <if test="scStatus != null">
+        #{scStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="rdStatus != null">
+        #{rdStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrderExample" resultType="java.lang.Long">
+    select count(*) from reclamation_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update reclamation_order
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderNo != null">
+        order_no = #{record.orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.scrapCode != null">
+        scrap_code = #{record.scrapCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ownerId != null">
+        owner_id = #{record.ownerId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.scId != null">
+        sc_id = #{record.scId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rdId != null">
+        rd_id = #{record.rdId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.amount != null">
+        amount = #{record.amount,jdbcType=INTEGER},
+      </if>
+      <if test="record.unit != null">
+        unit = #{record.unit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.money != null">
+        money = #{record.money,jdbcType=INTEGER},
+      </if>
+      <if test="record.scStatus != null">
+        sc_status = #{record.scStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rdStatus != null">
+        rd_status = #{record.rdStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update reclamation_order
+    set id = #{record.id,jdbcType=INTEGER},
+      order_no = #{record.orderNo,jdbcType=VARCHAR},
+      scrap_code = #{record.scrapCode,jdbcType=VARCHAR},
+      owner_id = #{record.ownerId,jdbcType=VARCHAR},
+      sc_id = #{record.scId,jdbcType=VARCHAR},
+      rd_id = #{record.rdId,jdbcType=VARCHAR},
+      amount = #{record.amount,jdbcType=INTEGER},
+      unit = #{record.unit,jdbcType=VARCHAR},
+      money = #{record.money,jdbcType=INTEGER},
+      sc_status = #{record.scStatus,jdbcType=VARCHAR},
+      rd_status = #{record.rdStatus,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrder">
+    update reclamation_order
+    <set>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="scrapCode != null">
+        scrap_code = #{scrapCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerId != null">
+        owner_id = #{ownerId,jdbcType=VARCHAR},
+      </if>
+      <if test="scId != null">
+        sc_id = #{scId,jdbcType=VARCHAR},
+      </if>
+      <if test="rdId != null">
+        rd_id = #{rdId,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=INTEGER},
+      </if>
+      <if test="unit != null">
+        unit = #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="money != null">
+        money = #{money,jdbcType=INTEGER},
+      </if>
+      <if test="scStatus != null">
+        sc_status = #{scStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="rdStatus != null">
+        rd_status = #{rdStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.reclamation.reclamationOrder.domain.ReclamationOrder">
+    update reclamation_order
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      scrap_code = #{scrapCode,jdbcType=VARCHAR},
+      owner_id = #{ownerId,jdbcType=VARCHAR},
+      sc_id = #{scId,jdbcType=VARCHAR},
+      rd_id = #{rdId,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=INTEGER},
+      unit = #{unit,jdbcType=VARCHAR},
+      money = #{money,jdbcType=INTEGER},
+      sc_status = #{scStatus,jdbcType=VARCHAR},
+      rd_status = #{rdStatus,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getPageList" resultMap="BaseResultMap">
+    SELECT
+      o.name owner_name,
+      sc.name sc_name,
+      sd0.dict_text sc_status_val,
+      sd1.dict_text rd_status_val,
+      s.scrap_name,
+      ro.*
+    FROM
+      reclamation_order ro
+        LEFT JOIN owner o ON INSTR(ifnull(o.name, ''), ifnull('${search}', '')) > 0
+        LEFT JOIN scrap_collector sc ON ro.sc_id = sc.id
+        LEFT JOIN sys_dict sd0 ON ro.sc_status = sd0.dict_option
+        LEFT JOIN sys_dict sd1 ON ro.rd_status = sd1.dict_option
+        LEFT JOIN scrap s ON ro.scrap_code = s.scrap_code
+    WHERE
+      ro.owner_id = o.id
+  </select>
+</mapper>

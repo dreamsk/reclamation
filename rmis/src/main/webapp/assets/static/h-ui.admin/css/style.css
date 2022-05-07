@@ -1,0 +1,41 @@
+@charset "utf-8";
+
+/* 你自己的样式 */
+
+table> thead> tr> th:first-child {
+	background-image: none !important;
+}
+
+table> thead> tr> th,
+table> tbody> tr> td {
+	text-align: center !important;
+}
+
+.selected {
+	background-color: #f5fafe;
+}
+
+.menuContent {
+	display: none;
+	position: absolute;
+	z-index: 9999;
+	border: 1px solid;
+	border-radius: 3px;
+	background-color: white;
+}
+
+#iconContent li {
+	display: inline-block;
+	float: left;
+	margin: 5px;
+	cursor: pointer;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
+	text-align: center;
+	font-size: 20px;
+}
+
+#iconContent li:hover {
+	background-color: #009688;
+}
